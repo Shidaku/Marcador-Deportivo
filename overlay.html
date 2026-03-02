@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Padel Scoreboard Overlay</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@1,300;1,700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --team1-color: #3399FF;
+            --team2-color: #FF3333;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto Condensed', sans-serif;
+            background: transparent; /* Fondo transparente para OBS */
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        #scoreboard-container {
+            width: 100%;
+            max-width: 1200px;
+            aspect-ratio: 16/9;
+            background-color: #000;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            padding: 2% 4%;
+            display: flex;
+            flex-direction: column;
+            color: white;
+            justify-content: space-between;
+        }
+
+        #header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border-bottom: 2px solid #333;
+            padding-bottom: 1%;
+        }
+
+        #court-name {
+            font-size: 3em;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        #match-title {
+            font-size: 1.2em;
+            font-weight: 300;
+            color: #ccc;
+            margin-top: -5px;
+        }
+
+        .team-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 2% 0;
+            border-radius: 8px;
+            padding: 1%;
+            position: relative;
+        }
+
+        .team-row.server::after {
+            content: "✦";
+            position: absolute;
+            left: -10px;
+            color: white;
+            font-size: 1.5em;
+        }
+
+        .team-names {
+            font-size: 2.2em;
+            font-weight: 700;
+            width: 50%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .score-boxes {
+            display: flex;
+            gap: 15px;
+            width: 40%;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        .set-box {
+            width: 70px;
+            height: 70px;
+            background-color: #1a1a1a;
+            border: 2px solid;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2em;
+            font-weight: 700;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .set-box.active {
+            color: white;
+        }
+
+        .points-box {
+            width: 100px;
+            height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 3.5em;
+            font-weight: 700;
+            border-radius: 12px;
+            margin-left: 20px;
+        }
+
+        #footer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Roboto', sans-serif;
+            font-size: 1em;
+            color: #888;
+        }
+
+        /* Colores dinámicos */
+        .team-row-1 .set-box { border-color: var(--team1-color); }
+        .team-row-2 .set-box { border-color: var(--team2-color); }
+        .team-row-1 .points-box { background-color: var(--team1-color); }
+        .team-row-2 .points-box { background-color: var(--team2-color); }
+
+    </style>
+</head>
+<body>
+
+    <div id="scoreboard-container">
+        <div id="header">
+            <div id="court-name">CIUDAD PADEL</div>
+            <div id="match-title">5TA MASCULINO - SEMIFINAL</div>
+        </div>
+
+        <div id="teams-container">
+            <div id="team1-row" class="team-row team-row-1">
+                <div id="team1-names" class="team-names">JUAN / PEDRO</div>
+                <div class="score-boxes">
+                    <div id="team1-set1" class="set-box active">0</div>
+                    <div id="team1-set2" class="set-box">0</div>
+                    <div id="team1-set3" class="set-box">0</div>
+                    <div id="team1-points" class="points-box">0</div>
+                </div>
+            </div>
+
+            <div id="team2-row" class="team-row team-row-2">
+                <div id="team2-names" class="team-names">CARLOS / DIEGO</div>
+                <div class="score-boxes">
+                    <div id="team2-set1" class="set-box active">0</div>
+                    <div id="team2-set2" class="set-box">0</div>
+                    <div id="team2-set3" class="set-box">0</div>
+                    <div id="team2-points" class="points-box">0</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+    <script>
+        // --- 1. CONFIGURACIÓN DE FIREBASE (PEGA TUS DATOS AQUÍ) ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyBVcHIyjlfCHLKYU2HNj2rmmPNpmghQrXc",
+            authDomain: "marcador-deportivo-8f567.firebaseapp.com",
+            databaseURL: "https://marcador-deportivo-8f567-default-rtdb.firebaseio.com/", // Copia tu URL completa de Realtime Database aquí
+            projectId: "marcador-deportivo-8f567",
+            storageBucket: "marcador-deportivo-8f567.firebasestorage.app",
+            messagingSenderId: "803031766591",
+            appId: "1:803031766591:web:3767df3dcd00c752f78a8a",
+            measurementId: ""
+        };
+
+        // --- 2. INICIALIZAR FIREBASE ---
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // --- 3. REFERENCIA A TUS DATOS ---
+        const matchStateRef = database.ref('matchState'); // O la ruta que usaste al importar
+
+        // --- 4. ESCUCHAR CAMBIOS EN TIEMPO REAL ---
+        matchStateRef.on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                updateOverlay(data);
+            }
+        });
+
+        // --- 5. FUNCIÓN PARA ACTUALIZAR LA PÁGINA ---
+        function updateOverlay(data) {
+            // Personalización
+            document.getElementById('court-name').innerText = data.courtName;
+            document.getElementById('match-title').innerText = data.matchTitle;
+            document.documentElement.style.setProperty('--team1-color', data.colorTeam1);
+            document.documentElement.style.setProperty('--team2-color', data.colorTeam2);
+
+            // Nombres y Puntos
+            document.getElementById('team1-names').innerText = data.team1.names;
+            document.getElementById('team2-names').innerText = data.team2.names;
+            document.getElementById('team1-points').innerText = data.team1.pointsText; // Usamos el texto de pádel (15, 30, A)
+            document.getElementById('team2-points').innerText = data.team2.pointsText;
+
+            // Sets y Juegos
+            updateSets(data.team1.games, data.team2.games, data.matchComplete);
+
+            // Marcador de Saque
+            updateServerIndicator(data.server);
+        }
+
+        function updateSets(t1Games, t2Games, matchComplete) {
+            const setsPerMatch = 3;
+            for (let i = 1; i <= setsPerMatch; i++) {
+                const setT1 = document.getElementById(`team1-set${i}`);
+                const setT2 = document.getElementById(`team2-set${i}`);
+                
+                // Mostrar juegos o 0 si el set no ha empezado
+                setT1.innerText = t1Games[i-1] !== undefined ? t1Games[i-1] : "0";
+                setT2.innerText = t2Games[i-1] !== undefined ? t2Games[i-1] : "0";
+
+                // Marcar el set activo o completado
+                setT1.classList.remove('active');
+                setT2.classList.remove('active');
+
+                // Lógica de set activo simplificada para la vista
+                if (!matchComplete) {
+                    // Si el set tiene juegos pero no está en el índice final, asumimos que es el actual
+                    // (Esta lógica se refinaría en el panel de control, aquí solo mostramos)
+                    // Para simplificar el overlay, solo mostramos los juegos tal cual.
+                }
+            }
+        }
+
+        function updateServerIndicator(serverTeamId) {
+            document.getElementById('team1-row').classList.remove('server');
+            document.getElementById('team2-row').classList.remove('server');
+            
+            if (serverTeamId === 1) {
+                document.getElementById('team1-row').classList.add('server');
+            } else if (serverTeamId === 2) {
+                document.getElementById('team2-row').classList.add('server');
+            }
+        }
+
+    </script>
+</body>
+</html>

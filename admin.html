@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Panel de Control - Pádel Scoreboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --team1-color: #3399FF;
+            --team2-color: #FF3333;
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+        }
+
+        #admin-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            font-family: 'Roboto Condensed', sans-serif;
+            font-size: 2.5em;
+            letter-spacing: 1px;
+            color: #000;
+        }
+
+        .config-section {
+            background-color: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .control-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        input[type="text"], input[type="color"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1.1em;
+            box-sizing: border-box;
+        }
+
+        .color-pickers {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .score-buttons-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .score-button {
+            background-color: #1a1a1a;
+            color: white;
+            border: 2px solid #ccc;
+            border-radius: 12px;
+            padding: 20px;
+            font-size: 1.5em;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.2s;
+        }
+
+        .score-button.t1 { background-color: var(--team1-color); border-color: var(--team1-color); }
+        .score-button.t2 { background-color: var(--team2-color); border-color: var(--team2-color); }
+
+        .game-buttons-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .action-button {
+            flex: 1;
+            padding: 15px;
+            border-radius: 8px;
+            border: none;
+            font-size: 1.1em;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .action-button.reset { background-color: #e74c3c; color: white; }
+        .action-button.save { background-color: #2ecc71; color: white; }
+
+        .paddel-points {
+            font-size: 0.7em;
+            margin-left: 5px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="admin-container">
+        <h1>CIUDAD PADEL</h1>
+
+        <div class="config-section">
+            <h2>Configuración del Partido</h2>
+            
+            <div class="input-group">
+                <label for="courtName">Nombre de la Cancha</label>
+                <input type="text" id="courtName" placeholder="e.g. CIUDAD PADEL Central">
+            </div>
+
+            <div class="input-group">
+                <label for="matchTitle">Título del Partido</label>
+                <input type="text" id="matchTitle" placeholder="e.g. 5TA MASCULINO - FINAL">
+            </div>
+
+            <div class="color-pickers">
+                <div class="input-group" style="flex: 1">
+                    <label for="colorTeam1">Color T1</label>
+                    <input type="color" id="colorTeam1" value="#3399FF">
+                </div>
+                <div class="input-group" style="flex: 1">
+                    <label for="colorTeam2">Color T2</label>
+                    <input type="color" id="colorTeam2" value="#FF3333">
+                </div>
+            </div>
+
+            <button class="action-button save" onclick="saveMatchSettings()">Guardar Nombres y Colores</button>
+        </div>
+
+        <div class="config-section control-section">
+            <h2>Control del Puntuaje (Táctil)</h2>
+
+            <div class="score-buttons-group">
+                <button class="score-button t1" onclick="scorePoint(1)">+ Punto T1 <span class="paddel-points">(15/30/40)</span></button>
+                <button class="score-button t2" onclick="scorePoint(2)">+ Punto T2 <span class="paddel-points">(15/30/40)</span></button>
+            </div>
+
+            <div class="game-buttons-group">
+                <button class="action-button" onclick="endGame(1)">Gana Juego T1</button>
+                <button class="action-button" onclick="endGame(2)">Gana Juego T2</button>
+            </div>
+
+            <div class="game-buttons-group">
+                <button class="action-button" style="background-color: var(--team1-color); color: white;" onclick="changeServer(1)">Saque T1</button>
+                <button class="action-button" style="background-color: var(--team2-color); color: white;" onclick="changeServer(2)">Saque T2</button>
+            </div>
+
+            <button class="action-button reset" onclick="resetMatch()">RESETEAR PARTIDO</button>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+    <script>
+        // --- 1. CONFIGURACIÓN DE FIREBASE (PEGA TUS DATOS AQUÍ) ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyBVcHIyjlfCHLKYU2HNj2rmmPNpmghQrXc",
+            authDomain: "marcador-deportivo-8f567.firebaseapp.com",
+            databaseURL: "https://marcador-deportivo-8f567-default-rtdb.firebaseio.com/", // Copia tu URL completa de Realtime Database aquí
+            projectId: "marcador-deportivo-8f567",
+            storageBucket: "marcador-deportivo-8f567.firebasestorage.app",
+            messagingSenderId: "803031766591",
+            appId: "1:803031766591:web:3767df3dcd00c752f78a8a",
+            measurementId: ""
+        };
+
+        // --- 2. INICIALIZAR FIREBASE ---
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const matchStateRef = database.ref('matchState'); // Mismo nombre que en overlay.html
+
+        // --- 3. LÓGICA DEL PUNTUAJE DE PÁDEL ---
+        const PADEL_POINTS_TEXT = ["0", "15", "30", "40", "A", "J"]; // 0, 15, 30, 40, Ventaja, Juego
+
+        // Función para anotar un punto
+        function scorePoint(teamId) {
+            matchStateRef.once('value').then(snapshot => {
+                const data = snapshot.val();
+                if (!data) return;
+
+                let scoreObj = teamId === 1 ? data.team1 : data.team2;
+                let otherScoreObj = teamId === 1 ? data.team2 : data.team1;
+
+                // Lógica secuencial de puntos de pádel
+                if (scoreObj.points === "0") {
+                    scoreObj.points = "15";
+                } else if (scoreObj.points === "15") {
+                    scoreObj.points = "30";
+                } else if (scoreObj.points === "30") {
+                    scoreObj.points = "40";
+                } else if (scoreObj.points === "40") {
+                    // Si el otro tiene 40 o Ventaja, es un lío de ventajas
+                    if (otherScoreObj.points === "40" || otherScoreObj.points === "A") {
+                        if (scoreObj.points === "40") {
+                            scoreObj.points = "A";
+                        } else if (scoreObj.points === "A") {
+                            // Si ya tenía Ventaja, GANA EL JUEGO
+                            endGame(teamId, data);
+                            return; // Terminamos aquí
+                        }
+                    } else {
+                        // El otro no tiene 40 ni Ventaja, GANA EL JUEGO
+                        endGame(teamId, data);
+                        return; // Terminamos aquí
+                    }
+                } else if (scoreObj.points === "A") {
+                     // Lógica si ya tiene ventaja
+                     endGame(teamId, data);
+                     return;
+                }
+
+                // Actualizar puntos de texto
+                data.team1.pointsText = PADEL_POINTS_TEXT[PADEL_POINTS_TEXT.indexOf(data.team1.points)];
+                data.team2.pointsText = PADEL_POINTS_TEXT[PADEL_POINTS_TEXT.indexOf(data.team2.points)];
+
+                // Guardar los datos actualizados
+                matchStateRef.set(data);
+            });
+        }
+
+        // Función para finalizar un juego y actualizar sets
+        function endGame(teamId, data) {
+            matchStateRef.once('value').then(snapshot => {
+                let currentData = data; // Usar los datos pasados si están disponibles, o obtener nuevos
+                if (!currentData) {
+                    currentData = snapshot.val();
+                    if (!currentData) return;
+                }
+
+                // Reiniciar puntos
+                currentData.team1.points = "0";
+                currentData.team1.pointsText = "0";
+                currentData.team2.points = "0";
+                currentData.team2.pointsText = "0";
+
+                // Encontrar el set actual (simplificado para 3 sets)
+                let currentSetIndex = 0;
+                for(let i=0; i < currentData.team1.games.length; i++){
+                    if(currentData.team1.games[i] + currentData.team2.games[i] < 12 && !(currentData.team1.games[i] >= 6 || currentData.team2.games[i] >= 6)){
+                        currentSetIndex = i;
+                        break;
+                    }
+                    if(i === currentData.team1.games.length - 1){ // Si es el último set y no se ha encontrado activo
+                         currentSetIndex = i;
+                    }
+                }
+                
+                // Actualizar juegos del equipo ganador
+                let gamesObj = teamId === 1 ? currentData.team1.games : currentData.team2.games;
+                gamesObj[currentSetIndex] = (gamesObj[currentSetIndex] || 0) + 1;
+
+                // Lógica de set completo simplificada para la vista (se refinaría más en una app pro)
+                if (teamId === 1 && currentData.team1.games[currentSetIndex] >= 6) {
+                    currentData.team1.sets = (currentData.team1.sets || 0) + 1;
+                    // Lógica para terminar el partido si es mejor de 3
+                    if (currentData.team1.sets >= 2) currentData.matchComplete = true;
+                } else if (teamId === 2 && currentData.team2.games[currentSetIndex] >= 6) {
+                    currentData.team2.sets = (currentData.team2.sets || 0) + 1;
+                    if (currentData.team2.sets >= 2) currentData.matchComplete = true;
+                }
+                
+                // Cambiar el saque automáticamente al cambiar de juego
+                changeServer(teamId === 1 ? 2 : 1, currentData);
+
+                // Guardar los datos actualizados
+                matchStateRef.set(currentData);
+            });
+        }
+
+        // Funciones auxiliares
+        function changeServer(teamId, data) {
+             matchStateRef.once('value').then(snapshot => {
+                let currentData = data || snapshot.val();
+                if(!currentData) return;
+                currentData.server = teamId;
+                matchStateRef.set(currentData);
+             });
+        }
+
+        function saveMatchSettings() {
+            matchStateRef.once('value').then(snapshot => {
+                const data = snapshot.val();
+                if (!data) return;
+
+                data.courtName = document.getElementById('courtName').value;
+                data.matchTitle = document.getElementById('matchTitle').value;
+                data.colorTeam1 = document.getElementById('colorTeam1').value;
+                data.colorTeam2 = document.getElementById('colorTeam2').value;
+                
+                matchStateRef.set(data);
+                alert("Nombres y colores actualizados.");
+            });
+        }
+
+        function resetMatch() {
+            if(confirm("¿Estás seguro de que quieres resetear todo el partido?")){
+                // Cargar el estado inicial de nuevo
+                // En una app real lo harías más elegante, aquí simplemente sobrescribimos con el estado inicial que definimos al principio
+                matchStateRef.set({
+                  courtName: "CIUDAD PADEL Central",
+                  matchTitle: "5TA MASCULINO - FINAL",
+                  colorTeam1: "#3399FF",
+                  colorTeam2: "#FF3333",
+                  team1: { names: "LEANDRO / VLADIMIR", points: "0", pointsText: "0", games: [0, 0, 0], sets: 0, tieBreakPoints: 0 },
+                  team2: { names: "WUIS / CARRANZA", points: "0", pointsText: "0", games: [0, 0, 0], sets: 0, tieBreakPoints: 0 },
+                  server: 1,
+                  pointSequence: ["0", "15", "30", "40"],
+                  matchComplete: false
+                }).then(() => {
+                    location.reload(); // Recargar el panel para ver los cambios
+                });
+            }
+        }
+
+    </script>
+</body>
+</html>
