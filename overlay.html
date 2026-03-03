@@ -4,58 +4,56 @@
     <meta charset="UTF-8">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
     <style>
-        :root { --t1-color: #3399FF; --t2-color: #FF3333; }
-        body { margin: 0; background: transparent; color: white; font-family: 'Orbitron', sans-serif; overflow: hidden; }
+        :root { --t1-color: #3399FF; --t2-color: #FF3333; --border-color: #ffffff; }
+        body { margin: 0; background: transparent; color: white; font-family: 'Orbitron', sans-serif; }
         
         #scoreboard {
-            width: 900px; background: rgba(0,0,0,0.9); border-radius: 15px;
-            padding: 20px 30px; margin: 50px auto; border-bottom: 5px solid white;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            width: 1050px; background: rgba(0,0,0,0.92); border-radius: 20px;
+            padding: 20px 30px; margin: 40px auto;
+            border-top: 6px solid var(--border-color);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
         }
 
-        .header { text-align: center; border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 15px; }
-        .court { font-size: 28px; text-transform: uppercase; letter-spacing: 3px; margin: 0; }
-        
-        .team-row { display: flex; align-items: center; height: 90px; margin: 10px 0; }
+        .header { text-align: center; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        .court { font-size: 28px; text-transform: uppercase; margin: 0; letter-spacing: 2px; }
+        .match-title { font-size: 14px; color: #aaa; margin: 5px 0 0 0; }
 
-        /* ÁREA DE NOMBRE FLEXIBLE */
-        .name-area { 
-            flex: 1; font-size: 28px; font-weight: bold; 
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
-            padding-right: 20px; 
+        .team-row { display: flex; align-items: center; height: 80px; margin: 15px 0; }
+
+        /* CONTENEDOR DE JUGADORES INDIVIDUALES */
+        .players-container { display: flex; gap: 10px; flex: 1; }
+        .player-card {
+            background: rgba(255,255,255,0.05);
+            padding: 10px 15px; border-radius: 8px; border-left: 4px solid white;
+            font-size: 20px; min-width: 180px; white-space: nowrap;
+            overflow: hidden; text-overflow: ellipsis;
         }
+        .t1-border { border-left-color: var(--t1-color); }
+        .t2-border { border-left-color: var(--t2-color); }
 
-        /* CONTENEDOR DE SETS */
-        .sets-container { display: flex; gap: 10px; margin-right: 20px; }
+        .sets-info { display: flex; align-items: center; gap: 15px; margin-left: 20px; }
+        .sets-won { font-size: 24px; color: #ffd700; font-weight: bold; width: 30px; }
+
+        .sets-grid { display: flex; gap: 8px; }
         .set-box { 
-            width: 55px; height: 75px; background: #1a1a1a; border: 2px solid #333;
-            border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 26px;
+            width: 45px; height: 60px; background: #111; border: 1px solid #333;
+            border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 22px;
         }
 
-        /* CAJA DE PUNTAJE PRINCIPAL */
-        .points-wrapper { position: relative; display: flex; align-items: center; }
-        
+        .points-area { position: relative; display: flex; align-items: center; margin-left: 20px; }
         .points-box {
-            width: 110px; height: 90px; border-radius: 10px; overflow: hidden;
-            display: flex; justify-content: center; align-items: center; font-size: 50px;
-            position: relative;
+            width: 95px; height: 80px; border-radius: 12px; overflow: hidden;
+            display: flex; justify-content: center; align-items: center; font-size: 42px;
+            position: relative; box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
         }
 
-        /* PUNTO DE SAQUE A LA DERECHA */
         .server-dot { 
-            width: 18px; height: 18px; border-radius: 50%; background: white; 
-            margin-left: 15px; opacity: 0; transition: opacity 0.3s;
-            box-shadow: 0 0 15px white;
+            width: 16px; height: 16px; border-radius: 50%; background: white; 
+            margin-left: 15px; opacity: 0; transition: 0.3s; box-shadow: 0 0 15px white;
         }
         .is-serving { opacity: 1; }
 
-        /* ANIMACIÓN DE DESLIZAMIENTO */
-        .score-anim-container {
-            position: absolute; width: 100%; height: 100%;
-            transition: transform 0.4s ease-in-out;
-            display: flex; flex-direction: column; align-items: center;
-        }
-
+        .score-anim { position: absolute; width: 100%; transition: transform 0.4s ease; display: flex; flex-direction: column; align-items: center; }
         .t1-bg { background-color: var(--t1-color); }
         .t2-bg { background-color: var(--t2-color); }
     </style>
@@ -63,34 +61,45 @@
 <body>
 
 <div id="scoreboard">
-    <div class="header"><p id="court" class="court">CIUDAD PADEL</p></div>
+    <div class="header">
+        <p id="court" class="court">NOMBRE CANCHA</p>
+        <p id="match" class="match-title">TÍTULO DEL PARTIDO</p>
+    </div>
 
     <div class="team-row">
-        <div id="name1" class="name-area">...</div>
-        <div class="sets-container">
-            <div id="t1s1" class="set-box">0</div>
-            <div id="t1s2" class="set-box">0</div>
-            <div id="t1s3" class="set-box">0</div>
+        <div class="players-container">
+            <div id="p1t1" class="player-card t1-border">...</div>
+            <div id="p2t1" class="player-card t1-border">...</div>
         </div>
-        <div class="points-wrapper">
-            <div class="points-box t1-bg">
-                <div id="wrapper1" class="score-anim-container"><div id="p1">0</div></div>
+        <div class="sets-info">
+            <div id="sets1" class="sets-won">0</div>
+            <div class="sets-grid">
+                <div id="t1s1" class="set-box">0</div>
+                <div id="t1s2" class="set-box">0</div>
+                <div id="t1s3" class="set-box">0</div>
             </div>
+        </div>
+        <div class="points-area">
+            <div class="points-box t1-bg"><div id="w1" class="score-anim"><div id="p1">0</div></div></div>
             <div id="dot1" class="server-dot"></div>
         </div>
     </div>
 
     <div class="team-row">
-        <div id="name2" class="name-area">...</div>
-        <div class="sets-container">
-            <div id="t2s1" class="set-box">0</div>
-            <div id="t2s2" class="set-box">0</div>
-            <div id="t2s3" class="set-box">0</div>
+        <div class="players-container">
+            <div id="p1t2" class="player-card t2-border">...</div>
+            <div id="p2t2" class="player-card t2-border">...</div>
         </div>
-        <div class="points-wrapper">
-            <div class="points-box t2-bg">
-                <div id="wrapper2" class="score-anim-container"><div id="p2">0</div></div>
+        <div class="sets-info">
+            <div id="sets2" class="sets-won">0</div>
+            <div class="sets-grid">
+                <div id="t2s1" class="set-box">0</div>
+                <div id="t2s2" class="set-box">0</div>
+                <div id="t2s3" class="set-box">0</div>
             </div>
+        </div>
+        <div class="points-area">
+            <div class="points-box t2-bg"><div id="w2" class="score-anim"><div id="p2">0</div></div></div>
             <div id="dot2" class="server-dot"></div>
         </div>
     </div>
@@ -117,29 +126,27 @@
         const d = snap.val();
         if(!d) return;
 
-        // Actualizar Colores
         document.documentElement.style.setProperty('--t1-color', d.colorTeam1);
         document.documentElement.style.setProperty('--t2-color', d.colorTeam2);
+        document.documentElement.style.setProperty('--border-color', d.colorBorder || "#ffffff");
         
-        // Nombres
-        document.getElementById('name1').innerText = d.team1.names;
-        document.getElementById('name2').innerText = d.team2.names;
+        document.getElementById('court').innerText = d.courtName;
+        document.getElementById('match').innerText = d.matchTitle;
         
-        // Saque (Indicador a la derecha)
+        document.getElementById('p1t1').innerText = d.team1.p1;
+        document.getElementById('p2t1').innerText = d.team1.p2;
+        document.getElementById('p1t2').innerText = d.team2.p1;
+        document.getElementById('p2t2').innerText = d.team2.p2;
+
+        document.getElementById('sets1').innerText = d.team1.sets;
+        document.getElementById('sets2').innerText = d.team2.sets;
+        
         document.getElementById('dot1').classList.toggle('is-serving', d.server == 1);
         document.getElementById('dot2').classList.toggle('is-serving', d.server == 2);
 
-        // Animación de puntos
-        if(lastP1 !== d.team1.pointsText) {
-            runAnim('wrapper1', 'p1', d.team1.pointsText);
-            lastP1 = d.team1.pointsText;
-        }
-        if(lastP2 !== d.team2.pointsText) {
-            runAnim('wrapper2', 'p2', d.team2.pointsText);
-            lastP2 = d.team2.pointsText;
-        }
+        if(lastP1 !== d.team1.pointsText) { runAnim('w1', 'p1', d.team1.pointsText); lastP1 = d.team1.pointsText; }
+        if(lastP2 !== d.team2.pointsText) { runAnim('w2', 'p2', d.team2.pointsText); lastP2 = d.team2.pointsText; }
 
-        // Juegos de cada Set
         for(let i=1; i<=3; i++) {
             document.getElementById(`t1s${i}`).innerText = d.team1.games[i-1];
             document.getElementById(`t2s${i}`).innerText = d.team2.games[i-1];
@@ -148,16 +155,14 @@
 
     function runAnim(wrapId, scoreId, newVal) {
         const w = document.getElementById(wrapId);
-        const s = document.getElementById(scoreId);
-        // Deslizar hacia arriba el viejo
         w.style.transform = "translateY(-100%)";
         setTimeout(() => {
             w.style.transition = "none";
-            w.style.transform = "translateY(100%)"; // Aparecer por abajo
-            s.innerText = newVal;
+            w.style.transform = "translateY(100%)";
+            document.getElementById(scoreId).innerText = newVal;
             setTimeout(() => {
-                w.style.transition = "transform 0.4s ease-in-out";
-                w.style.transform = "translateY(0)"; // Subir a la posición central
+                w.style.transition = "transform 0.4s ease";
+                w.style.transform = "translateY(0)";
             }, 50);
         }, 400);
     }
