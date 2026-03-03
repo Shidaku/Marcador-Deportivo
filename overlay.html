@@ -1,210 +1,166 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
     <meta charset="UTF-8">
-    <title>Overlay PRO - Pádel</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Orbitron:wght@700&family=Roboto+Condensed:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
     <style>
-        /* --- ESTILOS PROFESIONALES Y ANIMACIONES --- */
-        :root {
-            --t1-color: #3399FF;
-            --t2-color: #FF3333;
-            --font-main: 'Montserrat', sans-serif; /* Fuente por defecto */
-        }
-
-        body {
-            margin: 0; padding: 0; background: transparent; /* Fondo transparente para OBS */
-            font-family: var(--font-main); color: white; overflow: hidden;
-            display: flex; justify-content: center; align-items: center; height: 100vh;
-        }
-
-        #scoreboard-container {
-            width: 1000px; background: rgba(0, 0, 0, 0.85); border-radius: 15px;
-            padding: 20px 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            border-bottom: 5px solid white; /* Borde inferior dinámico */
-        }
-
-        .header { text-align: center; border-bottom: 1px solid #444; margin-bottom: 20px; padding-bottom: 10px; }
-        .court-name { font-size: 3rem; text-transform: uppercase; margin: 0; }
-        .match-title { font-size: 1.2rem; color: #aaa; margin: 0; font-weight: 300; }
-
-        .team-row { display: flex; align-items: center; justify-content: space-between; height: 100px; margin: 15px 0; position: relative; }
+        :root { --t1-color: #3399FF; --t2-color: #FF3333; }
+        body { margin: 0; background: transparent; color: white; font-family: 'Orbitron', sans-serif; overflow: hidden; }
         
-        /* EL PUNTO DE SAQUE PROFESIONAL */
-        .server-dot {
-            width: 15px; height: 15px; border-radius: 50%; background-color: transparent;
-            position: absolute; left: -25px; transition: background-color 0.3s, box-shadow 0.3s;
+        #scoreboard {
+            width: 900px; background: rgba(0,0,0,0.9); border-radius: 15px;
+            padding: 20px 30px; margin: 50px auto; border-bottom: 5px solid white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
-        .is-serving { background-color: white; box-shadow: 0 0 15px white; }
 
-        .team-names { font-size: 2.2rem; font-weight: 700; width: 550px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .score-boxes { display: flex; align-items: center; gap: 15px; }
+        .header { text-align: center; border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 15px; }
+        .court { font-size: 28px; text-transform: uppercase; letter-spacing: 3px; margin: 0; }
         
+        .team-row { display: flex; align-items: center; height: 90px; margin: 10px 0; }
+
+        /* ÁREA DE NOMBRE FLEXIBLE */
+        .name-area { 
+            flex: 1; font-size: 28px; font-weight: bold; 
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
+            padding-right: 20px; 
+        }
+
+        /* CONTENEDOR DE SETS */
+        .sets-container { display: flex; gap: 10px; margin-right: 20px; }
         .set-box { 
-            width: 60px; height: 80px; background: #222; border: 2px solid #444; border-radius: 8px;
-            display: flex; justify-content: center; align-items: center; font-size: 2rem;
+            width: 55px; height: 75px; background: #1a1a1a; border: 2px solid #333;
+            border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 26px;
         }
 
-        /* --- LA ANIMACIÓN DE PUNTAJE DESLIZANTE --- */
+        /* CAJA DE PUNTAJE PRINCIPAL */
+        .points-wrapper { position: relative; display: flex; align-items: center; }
+        
         .points-box {
-            width: 120px; height: 100px; border-radius: 12px; margin-left: 20px;
-            display: flex; justify-content: center; align-items: center;
-            font-size: 4.5rem; font-weight: 700;
-            overflow: hidden; /* Crucial para la animación */
+            width: 110px; height: 90px; border-radius: 10px; overflow: hidden;
+            display: flex; justify-content: center; align-items: center; font-size: 50px;
             position: relative;
         }
 
-        .score-display-wrapper {
-            display: flex; flex-direction: column; width: 100%; height: 100%;
-            position: absolute; left: 0;
-            transition: transform 0.4s ease-in-out; /* Velocidad de la animación */
+        /* PUNTO DE SAQUE A LA DERECHA */
+        .server-dot { 
+            width: 18px; height: 18px; border-radius: 50%; background: white; 
+            margin-left: 15px; opacity: 0; transition: opacity 0.3s;
+            box-shadow: 0 0 15px white;
+        }
+        .is-serving { opacity: 1; }
+
+        /* ANIMACIÓN DE DESLIZAMIENTO */
+        .score-anim-container {
+            position: absolute; width: 100%; height: 100%;
+            transition: transform 0.4s ease-in-out;
+            display: flex; flex-direction: column; align-items: center;
         }
 
-        .score-value {
-            display: flex; justify-content: center; align-items: center;
-            width: 100%; height: 100%;
-        }
-
-        /* Colores dinámicos */
-        .points-box.t1-bg { background-color: var(--t1-color); }
-        .points-box.t2-bg { background-color: var(--t2-color); }
-
+        .t1-bg { background-color: var(--t1-color); }
+        .t2-bg { background-color: var(--t2-color); }
     </style>
 </head>
 <body>
 
-    <div id="scoreboard-container">
-        <div class="header">
-            <div id="disp-court-name" class="court-name">CIUDAD PADEL</div>
-            <div id="disp-match-title" class="match-title">5TA MASCULINO - FINAL</div>
-        </div>
+<div id="scoreboard">
+    <div class="header"><p id="court" class="court">CIUDAD PADEL</p></div>
 
-        <div class="team-row">
+    <div class="team-row">
+        <div id="name1" class="name-area">...</div>
+        <div class="sets-container">
+            <div id="t1s1" class="set-box">0</div>
+            <div id="t1s2" class="set-box">0</div>
+            <div id="t1s3" class="set-box">0</div>
+        </div>
+        <div class="points-wrapper">
+            <div class="points-box t1-bg">
+                <div id="wrapper1" class="score-anim-container"><div id="p1">0</div></div>
+            </div>
             <div id="dot1" class="server-dot"></div>
-            <div id="disp-t1-names" class="team-names">JUGADOR 1 / JUGADOR 2</div>
-            <div class="score-boxes">
-                <div id="t1-s1" class="set-box">0</div>
-                <div id="t1-s2" class="set-box">0</div>
-                <div id="t1-s3" class="set-box">0</div>
-                <div class="points-box t1-bg">
-                    <div id="t1-score-wrapper" class="score-display-wrapper">
-                        <div id="t1-old-score" class="score-value">0</div>
-                        <div id="t1-new-score" class="score-value">15</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="team-row">
-            <div id="dot2" class="server-dot"></div>
-            <div id="disp-t2-names" class="team-names">JUGADOR 3 / JUGADOR 4</div>
-            <div class="score-boxes">
-                <div id="t2-s1" class="set-box">0</div>
-                <div id="t2-s2" class="set-box">0</div>
-                <div id="t2-s3" class="set-box">0</div>
-                <div class="points-box t2-bg">
-                    <div id="t2-score-wrapper" class="score-display-wrapper">
-                        <div id="t2-old-score" class="score-value">0</div>
-                        <div id="t2-new-score" class="score-value">15</div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-    
-    <script>
-        // --- CONFIGURACIÓN DE FIREBASE (PEGA TUS DATOS AQUÍ) ---
-        const firebaseConfig = {
-            apiKey: "AIzaSyBVcHIyjlfCHLKYU2HNj2rmmPNpmghQrXc",
-            authDomain: "marcador-deportivo-8f567.firebaseapp.com",
-            databaseURL: "https://marcador-deportivo-8f567-default-rtdb.firebaseio.com/",
-            projectId: "marcador-deportivo-8f567",
-            storageBucket: "marcador-deportivo-8f567.firebasestorage.app",
-            messagingSenderId: "803031766591",
-            appId: "1:803031766591:web:3767df3dcd00c752f78a8a",
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database().ref('matchState');
+    <div class="team-row">
+        <div id="name2" class="name-area">...</div>
+        <div class="sets-container">
+            <div id="t2s1" class="set-box">0</div>
+            <div id="t2s2" class="set-box">0</div>
+            <div id="t2s3" class="set-box">0</div>
+        </div>
+        <div class="points-wrapper">
+            <div class="points-box t2-bg">
+                <div id="wrapper2" class="score-anim-container"><div id="p2">0</div></div>
+            </div>
+            <div id="dot2" class="server-dot"></div>
+        </div>
+    </div>
+</div>
 
-        // Variables para rastrear el puntaje anterior y evitar animaciones en falso
-        let currentScoreT1 = "0";
-        let currentScoreT2 = "0";
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyBVcHIyjlfCHLKYU2HNj2rmmPNpmghQrXc",
+        authDomain: "marcador-deportivo-8f567.firebaseapp.com",
+        databaseURL: "https://marcador-deportivo-8f567-default-rtdb.firebaseio.com/",
+        projectId: "marcador-deportivo-8f567",
+        storageBucket: "marcador-deportivo-8f567.firebasestorage.app",
+        messagingSenderId: "803031766591",
+        appId: "1:803031766591:web:3767df3dcd00c752f78a8a"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database().ref('matchState');
 
-        // Escuchar cambios en tiempo real
-        db.on('value', (snapshot) => {
-            const data = snapshot.val();
-            if(!data) return;
+    let lastP1 = "0", lastP2 = "0";
 
-            // --- 1. PERSONALIZACIÓN FULL ---
-            // Fuente
-            document.documentElement.style.setProperty('--font-main', data.fontFamily);
-            // Colores
-            document.documentElement.style.setProperty('--t1-color', data.colorTeam1);
-            document.documentElement.style.setProperty('--t2-color', data.colorTeam2);
-            document.getElementById('scoreboard-container').style.borderColor = data.colorTeam2; // Borde dinámico
+    db.on('value', snap => {
+        const d = snap.val();
+        if(!d) return;
 
-            // Textos básicos
-            document.getElementById('disp-court-name').innerText = data.courtName;
-            document.getElementById('disp-match-title').innerText = data.matchTitle;
-            document.getElementById('disp-t1-names').innerText = data.team1.names;
-            document.getElementById('disp-t2-names').innerText = data.team2.names;
+        // Actualizar Colores
+        document.documentElement.style.setProperty('--t1-color', d.colorTeam1);
+        document.documentElement.style.setProperty('--t2-color', d.colorTeam2);
+        
+        // Nombres
+        document.getElementById('name1').innerText = d.team1.names;
+        document.getElementById('name2').innerText = d.team2.names;
+        
+        // Saque (Indicador a la derecha)
+        document.getElementById('dot1').classList.toggle('is-serving', d.server == 1);
+        document.getElementById('dot2').classList.toggle('is-serving', d.server == 2);
 
-            // --- 2. EL PUNTO DE SAQUE ---
-            // Se actualiza según quién saca
-            document.getElementById('dot1').className = data.server === 1 ? 'server-dot is-serving' : 'server-dot';
-            document.getElementById('dot2').className = data.server === 2 ? 'server-dot is-serving' : 'server-dot';
-
-            // --- 3. JUEGOS DE LOS SETS ---
-            for(let i=0; i<3; i++) {
-                document.getElementById(`t1-s${i+1}`).innerText = data.team1.games[i];
-                document.getElementById(`t2-s${i+1}`).innerText = data.team2.games[i];
-            }
-
-            // --- 4. LA ANIMACIÓN DE PUNTAJE ---
-            animateScoreChange(1, data.team1.pointsText);
-            animateScoreChange(2, data.team2.pointsText);
-        });
-
-        // Función para ejecutar la animación de puntaje deslizante
-        function animateScoreChange(teamId, newScore) {
-            let currentScoreVar = teamId === 1 ? currentScoreT1 : currentScoreT2;
-            let setScoreVar = teamId === 1 ? (s => currentScoreT1 = s) : (s => currentScoreT2 = s);
-
-            const wrapper = document.getElementById(`t${teamId}-score-wrapper`);
-            const oldScoreEl = document.getElementById(`t${teamId}-old-score`);
-            const newScoreEl = document.getElementById(`t${teamId}-new-score`);
-
-            // Si el puntaje no ha cambiado, no hacer nada
-            if (newScore === currentScoreVar) return;
-
-            // Si es un reseteo o un salto grande (ej: ganar un set), no animar
-            if (newScore === "0" || currentScoreVar === "J" || currentScoreVar === "A") {
-                oldScoreEl.innerText = newScore;
-                setScoreVar(newScore);
-                return;
-            }
-
-            // --- EJECUTAR ANIMACIÓN ---
-            // 1. Preparar valores
-            oldScoreEl.innerText = currentScoreVar; // El puntaje viejo arriba
-            newScoreEl.innerText = newScore;       // El puntaje nuevo abajo
-            wrapper.style.transition = 'none';    // Apagar animación para posicionar
-            wrapper.style.transform = 'translateY(0)'; // Volver a la posición inicial (arriba)
-
-            // 2. Forzar un "layout" del navegador para aplicar el cambio sin animación
-            wrapper.offsetHeight; 
-
-            // 3. Encender la animación y deslizar hacia arriba
-            wrapper.style.transition = 'transform 0.4s ease-in-out'; 
-            wrapper.style.transform = 'translateY(-100%)'; // Mover hacia arriba para mostrar el nuevo
-
-            // 4. Actualizar la variable de puntaje actual
-            setScoreVar(newScore);
+        // Animación de puntos
+        if(lastP1 !== d.team1.pointsText) {
+            runAnim('wrapper1', 'p1', d.team1.pointsText);
+            lastP1 = d.team1.pointsText;
+        }
+        if(lastP2 !== d.team2.pointsText) {
+            runAnim('wrapper2', 'p2', d.team2.pointsText);
+            lastP2 = d.team2.pointsText;
         }
 
-    </script>
+        // Juegos de cada Set
+        for(let i=1; i<=3; i++) {
+            document.getElementById(`t1s${i}`).innerText = d.team1.games[i-1];
+            document.getElementById(`t2s${i}`).innerText = d.team2.games[i-1];
+        }
+    });
+
+    function runAnim(wrapId, scoreId, newVal) {
+        const w = document.getElementById(wrapId);
+        const s = document.getElementById(scoreId);
+        // Deslizar hacia arriba el viejo
+        w.style.transform = "translateY(-100%)";
+        setTimeout(() => {
+            w.style.transition = "none";
+            w.style.transform = "translateY(100%)"; // Aparecer por abajo
+            s.innerText = newVal;
+            setTimeout(() => {
+                w.style.transition = "transform 0.4s ease-in-out";
+                w.style.transform = "translateY(0)"; // Subir a la posición central
+            }, 50);
+        }, 400);
+    }
+</script>
 </body>
 </html>
