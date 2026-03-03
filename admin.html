@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Padel Admin PRO</title>
+    <title>Padel Admin Sports 96.7fm</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #007aff; --success: #34c759; --danger: #ff3b30; --bg: #f5f5f7; }
@@ -46,8 +46,8 @@
 
         <div class="card">
             <h2>Jugadores (4 Casillas)</h2>
-            <div class="grid"><input type="text" id="p1t1" placeholder="P1 T1"><input type="text" id="p2t1" placeholder="P2 T1"></div>
-            <div class="grid"><input type="text" id="p1t2" placeholder="P1 T2"><input type="text" id="p2t2" placeholder="P2 T2"></div>
+            <div class="grid"><input type="text" id="p1t1" placeholder="Jugador 1"><input type="text" id="p2t1" placeholder="Jugador 2"></div>
+            <div class="grid"><input type="text" id="p1t2" placeholder="Jugador 3"><input type="text" id="p2t2" placeholder="Jugador 4"></div>
             <button class="btn btn-green" onclick="saveData()">Actualizar Nombres</button>
         </div>
 
@@ -124,7 +124,25 @@
         });}
 
         function setServer(t) { db.update({ server: t }); }
-        function reset() { if(confirm("¿Resetear?")) db.update({ "team1/pointsText":"0","team2/pointsText":"0","team1/games":[0,0,0],"team2/games":[0,0,0],"team1/sets":0,"team2/sets":0, "server":1 });}
+
+        // RESET ACTUALIZADO: BORRA NOMBRES
+        function reset() { 
+            if(confirm("¿Estás seguro que deseas resetear el partido?")) {
+                db.update({ 
+                    "team1/pointsText":"0",
+                    "team2/pointsText":"0",
+                    "team1/games":[0,0,0],
+                    "team2/games":[0,0,0],
+                    "team1/sets":0,
+                    "team2/sets":0,
+                    "team1/p1": "",
+                    "team1/p2": "",
+                    "team2/p1": "",
+                    "team2/p2": "",
+                    "server":1 
+                });
+            }
+        }
     </script>
 </body>
 </html>
