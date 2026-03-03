@@ -3,59 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Padel Admin - 4 Players</title>
+    <title>Padel Admin PRO</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #007aff; --success: #34c759; --danger: #ff3b30; --bg: #f5f5f7; }
         * { box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background: var(--bg); margin: 0; padding: 15px; }
+        body { background: var(--bg); margin: 0; padding: 10px; }
         .container { max-width: 500px; margin: 0 auto; }
-        .card { background: white; border-radius: 18px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        h2 { font-size: 13px; text-transform: uppercase; color: #8e8e93; margin: 0 0 15px 0; letter-spacing: 0.5px; }
-        .form-group { margin-bottom: 12px; }
-        label { display: block; font-size: 11px; font-weight: 600; margin-bottom: 6px; color: #48484a; }
-        input { width: 100%; padding: 12px; border: 1px solid #d1d1d6; border-radius: 10px; font-size: 15px; margin-bottom: 8px; }
-        .player-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .btn { border: none; border-radius: 12px; padding: 16px; font-weight: 600; cursor: pointer; color: white; width: 100%; transition: 0.2s; }
+        .card { background: white; border-radius: 15px; padding: 15px; margin-bottom: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.05); }
+        h2 { font-size: 13px; text-transform: uppercase; color: #8e8e93; margin: 0 0 10px 0; }
+        label { display: block; font-size: 11px; font-weight: 600; margin-bottom: 4px; color: #48484a; }
+        input[type="text"] { width: 100%; padding: 10px; border: 1px solid #d1d1d6; border-radius: 8px; font-size: 15px; margin-bottom: 8px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        input[type="color"] { width: 100%; height: 35px; border: none; cursor: pointer; border-radius: 6px; }
+        .btn { border: none; border-radius: 10px; padding: 14px; font-weight: 600; cursor: pointer; color: white; width: 100%; transition: 0.2s; font-size: 14px; }
+        .btn:active { transform: scale(0.96); opacity: 0.9; }
         .btn-green { background: var(--success); margin-top: 10px; }
         .btn-blue { background: var(--primary); }
         .btn-red { background: var(--danger); }
-        .score-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .btn-reset { background: #8e8e93; margin-top: 25px; font-size: 12px; }
+        .score-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+        .btn-reset { background: #8e8e93; margin-top: 20px; font-size: 11px; padding: 10px; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="card">
-            <h2>Configuración General</h2>
-            <label>Cancha / Torneo</label>
+            <h2>Personalización Visual</h2>
+            <label>Nombre de Cancha</label>
             <input type="text" id="courtName">
+            <label>Torneo / Categoría</label>
             <input type="text" id="matchTitle">
-            <div class="player-grid">
-                <div><label>Color T1</label><input type="color" id="colorT1"></div>
-                <div><label>Color T2</label><input type="color" id="colorT2"></div>
+            <div class="grid">
+                <div><label>Fondo Cabecera</label><input type="color" id="colorHeaderBg"></div>
+                <div><label>Fondo Interior</label><input type="color" id="colorInnerBg"></div>
             </div>
-            <label>Borde Superior</label>
-            <input type="color" id="colorBorder">
-            <button class="btn btn-green" onclick="saveData()">Guardar Cambios</button>
+            <div class="grid" style="margin-top:10px;">
+                <div><label>Color Equipo 1</label><input type="color" id="colorTeam1"></div>
+                <div><label>Color Equipo 2</label><input type="color" id="colorTeam2"></div>
+            </div>
+            <button class="btn btn-green" onclick="saveData()">Guardar Estilos</button>
         </div>
 
         <div class="card">
-            <h2>Equipo 1 (Azul)</h2>
-            <div class="player-grid">
-                <input type="text" id="p1t1" placeholder="Jugador 1">
-                <input type="text" id="p2t1" placeholder="Jugador 2">
-            </div>
-            <h2>Equipo 2 (Rojo)</h2>
-            <div class="player-grid">
-                <input type="text" id="p1t2" placeholder="Jugador 1">
-                <input type="text" id="p2t2" placeholder="Jugador 2">
-            </div>
-            <button class="btn btn-green" onclick="saveData()">Actualizar Jugadores</button>
+            <h2>Jugadores (4 Casillas)</h2>
+            <div class="grid"><input type="text" id="p1t1" placeholder="P1 T1"><input type="text" id="p2t1" placeholder="P2 T1"></div>
+            <div class="grid"><input type="text" id="p1t2" placeholder="P1 T2"><input type="text" id="p2t2" placeholder="P2 T2"></div>
+            <button class="btn btn-green" onclick="saveData()">Actualizar Nombres</button>
         </div>
 
         <div class="card">
-            <h2>Control del Partido</h2>
+            <h2>Control Táctil</h2>
             <div class="score-btns">
                 <button class="btn btn-blue" onclick="score(1)">Punto T1</button>
                 <button class="btn btn-red" onclick="score(2)">Punto T2</button>
@@ -87,9 +84,10 @@
             db.update({
                 courtName: document.getElementById('courtName').value,
                 matchTitle: document.getElementById('matchTitle').value,
-                colorTeam1: document.getElementById('colorT1').value,
-                colorTeam2: document.getElementById('colorT2').value,
-                colorBorder: document.getElementById('colorBorder').value,
+                colorHeaderBg: document.getElementById('colorHeaderBg').value,
+                colorInnerBg: document.getElementById('colorInnerBg').value,
+                colorTeam1: document.getElementById('colorTeam1').value,
+                colorTeam2: document.getElementById('colorTeam2').value,
                 "team1/p1": document.getElementById('p1t1').value,
                 "team1/p2": document.getElementById('p2t1').value,
                 "team2/p1": document.getElementById('p1t2').value,
@@ -99,15 +97,17 @@
 
         db.on('value', snap => {
             const d = snap.val();
-            document.getElementById('courtName').value = d.courtName;
-            document.getElementById('matchTitle').value = d.matchTitle;
-            document.getElementById('colorT1').value = d.colorTeam1;
-            document.getElementById('colorT2').value = d.colorTeam2;
-            document.getElementById('colorBorder').value = d.colorBorder || "#ffffff";
-            document.getElementById('p1t1').value = d.team1.p1 || "";
-            document.getElementById('p2t1').value = d.team1.p2 || "";
-            document.getElementById('p1t2').value = d.team2.p1 || "";
-            document.getElementById('p2t2').value = d.team2.p2 || "";
+            if(!d) return;
+            document.getElementById('courtName').value = d.courtName || "";
+            document.getElementById('matchTitle').value = d.matchTitle || "";
+            document.getElementById('colorHeaderBg').value = d.colorHeaderBg || "#000000";
+            document.getElementById('colorInnerBg').value = d.colorInnerBg || "#1a1a1a";
+            document.getElementById('colorTeam1').value = d.colorTeam1 || "#3399FF";
+            document.getElementById('colorTeam2').value = d.colorTeam2 || "#FF3333";
+            document.getElementById('p1t1').value = d.team1?.p1 || "";
+            document.getElementById('p2t1').value = d.team1?.p2 || "";
+            document.getElementById('p1t2').value = d.team2?.p1 || "";
+            document.getElementById('p2t2').value = d.team2?.p2 || "";
         });
 
         function score(t) { db.child(`team${t}/pointsText`).transaction(c => {
@@ -124,7 +124,7 @@
         });}
 
         function setServer(t) { db.update({ server: t }); }
-        function reset() { if(confirm("¿Resetear?")) db.update({ "team1/pointsText":"0","team2/pointsText":"0","team1/games":[0,0,0],"team2/games":[0,0,0],"team1/sets":0,"team2/sets":0,"server":1 });}
+        function reset() { if(confirm("¿Resetear?")) db.update({ "team1/pointsText":"0","team2/pointsText":"0","team1/games":[0,0,0],"team2/games":[0,0,0],"team1/sets":0,"team2/sets":0, "server":1 });}
     </script>
 </body>
 </html>
