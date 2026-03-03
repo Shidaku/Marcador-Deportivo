@@ -3,55 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Admin Padel Pro</title>
+    <title>Padel Admin - 4 Players</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: #f0f2f5; margin: 0; padding: 10px; overflow-x: hidden; }
+        :root { --primary: #007aff; --success: #34c759; --danger: #ff3b30; --bg: #f5f5f7; }
+        * { box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg); margin: 0; padding: 15px; }
         .container { max-width: 500px; margin: 0 auto; }
-        .card { background: white; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        h3 { margin-top: 0; color: #333; border-bottom: 2px solid #eee; padding-bottom: 5px; }
-        label { display: block; font-size: 12px; font-weight: bold; color: #666; margin-bottom: 4px; }
-        input, select { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .btn { border: none; border-radius: 8px; padding: 15px; color: white; font-weight: bold; cursor: pointer; font-size: 14px; }
-        .btn:active { opacity: 0.7; }
-        .btn-save { background: #2ecc71; width: 100%; }
-        .btn-blue { background: #3399FF; }
-        .btn-red { background: #FF3333; }
-        .btn-gray { background: #95a5a6; }
-        .btn-reset { background: #e74c3c; width: 100%; margin-top: 15px; }
+        .card { background: white; border-radius: 18px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        h2 { font-size: 13px; text-transform: uppercase; color: #8e8e93; margin: 0 0 15px 0; letter-spacing: 0.5px; }
+        .form-group { margin-bottom: 12px; }
+        label { display: block; font-size: 11px; font-weight: 600; margin-bottom: 6px; color: #48484a; }
+        input { width: 100%; padding: 12px; border: 1px solid #d1d1d6; border-radius: 10px; font-size: 15px; margin-bottom: 8px; }
+        .player-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .btn { border: none; border-radius: 12px; padding: 16px; font-weight: 600; cursor: pointer; color: white; width: 100%; transition: 0.2s; }
+        .btn-green { background: var(--success); margin-top: 10px; }
+        .btn-blue { background: var(--primary); }
+        .btn-red { background: var(--danger); }
+        .score-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .btn-reset { background: #8e8e93; margin-top: 25px; font-size: 12px; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="card">
-            <h3>Nombres y Estilo</h3>
-            <label>Pareja 1 (Azul)</label>
-            <input type="text" id="nameT1" placeholder="Ej: LUIS / DANIEL">
-            <label>Pareja 2 (Rojo)</label>
-            <input type="text" id="nameT2" placeholder="Ej: ENRIQUE / FERNANDO">
-            <div class="grid">
-                <div><label>Color T1</label><input type="color" id="colorT1" value="#3399FF"></div>
-                <div><label>Color T2</label><input type="color" id="colorT2" value="#FF3333"></div>
+            <h2>Configuración General</h2>
+            <label>Cancha / Torneo</label>
+            <input type="text" id="courtName">
+            <input type="text" id="matchTitle">
+            <div class="player-grid">
+                <div><label>Color T1</label><input type="color" id="colorT1"></div>
+                <div><label>Color T2</label><input type="color" id="colorT2"></div>
             </div>
-            <label>Fuente</label>
-            <select id="fontFamily">
-                <option value="'Orbitron', sans-serif">Digital (Orbitron)</option>
-                <option value="'Montserrat', sans-serif">Moderna (Montserrat)</option>
-                <option value="Arial, sans-serif">Clásica (Arial)</option>
-            </select>
-            <button class="btn btn-save" onclick="updateSettings()">GUARDAR CAMBIOS</button>
+            <label>Borde Superior</label>
+            <input type="color" id="colorBorder">
+            <button class="btn btn-green" onclick="saveData()">Guardar Cambios</button>
         </div>
 
         <div class="card">
-            <h3>Marcador en Vivo</h3>
-            <div class="grid">
-                <button class="btn btn-blue" onclick="changeScore(1, 1)">+ PUNTO T1</button>
-                <button class="btn btn-red" onclick="changeScore(2, 1)">+ PUNTO T2</button>
-                <button class="btn btn-gray" onclick="setServer(1)">SAQUE T1</button>
-                <button class="btn btn-gray" onclick="setServer(2)">SAQUE T2</button>
+            <h2>Equipo 1 (Azul)</h2>
+            <div class="player-grid">
+                <input type="text" id="p1t1" placeholder="Jugador 1">
+                <input type="text" id="p2t1" placeholder="Jugador 2">
             </div>
-            <button class="btn btn-reset" onclick="resetMatch()">RESETEAR PARTIDO</button>
+            <h2>Equipo 2 (Rojo)</h2>
+            <div class="player-grid">
+                <input type="text" id="p1t2" placeholder="Jugador 1">
+                <input type="text" id="p2t2" placeholder="Jugador 2">
+            </div>
+            <button class="btn btn-green" onclick="saveData()">Actualizar Jugadores</button>
+        </div>
+
+        <div class="card">
+            <h2>Control del Partido</h2>
+            <div class="score-btns">
+                <button class="btn btn-blue" onclick="score(1)">Punto T1</button>
+                <button class="btn btn-red" onclick="score(2)">Punto T2</button>
+                <button class="btn btn-blue" onclick="addGame(1)">Juego T1</button>
+                <button class="btn btn-red" onclick="addGame(2)">Juego T2</button>
+                <button class="btn btn-blue" onclick="setServer(1)">Saque T1</button>
+                <button class="btn btn-red" onclick="setServer(2)">Saque T2</button>
+            </div>
+            <button class="btn btn-reset" onclick="reset()">RESETEAR PARTIDO</button>
         </div>
     </div>
 
@@ -70,49 +83,48 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database().ref('matchState');
 
-        function updateSettings() {
+        function saveData() {
             db.update({
-                "team1/names": document.getElementById('nameT1').value,
-                "team2/names": document.getElementById('nameT2').value,
-                "colorTeam1": document.getElementById('colorT1').value,
-                "colorTeam2": document.getElementById('colorT2').value,
-                "fontFamily": document.getElementById('fontFamily').value
+                courtName: document.getElementById('courtName').value,
+                matchTitle: document.getElementById('matchTitle').value,
+                colorTeam1: document.getElementById('colorT1').value,
+                colorTeam2: document.getElementById('colorT2').value,
+                colorBorder: document.getElementById('colorBorder').value,
+                "team1/p1": document.getElementById('p1t1').value,
+                "team1/p2": document.getElementById('p2t1').value,
+                "team2/p1": document.getElementById('p1t2').value,
+                "team2/p2": document.getElementById('p2t2').value
             });
-            alert("Configuración actualizada");
         }
 
-        // Cargar datos actuales
         db.on('value', snap => {
-            const data = snap.val();
-            if(!data) return;
-            document.getElementById('nameT1').value = data.team1.names;
-            document.getElementById('nameT2').value = data.team2.names;
-            document.getElementById('colorT1').value = data.colorTeam1;
-            document.getElementById('colorT2').value = data.colorTeam2;
-            document.getElementById('fontFamily').value = data.fontFamily;
+            const d = snap.val();
+            document.getElementById('courtName').value = d.courtName;
+            document.getElementById('matchTitle').value = d.matchTitle;
+            document.getElementById('colorT1').value = d.colorTeam1;
+            document.getElementById('colorT2').value = d.colorTeam2;
+            document.getElementById('colorBorder').value = d.colorBorder || "#ffffff";
+            document.getElementById('p1t1').value = d.team1.p1 || "";
+            document.getElementById('p2t1').value = d.team1.p2 || "";
+            document.getElementById('p1t2').value = d.team2.p1 || "";
+            document.getElementById('p2t2').value = d.team2.p2 || "";
         });
 
+        function score(t) { db.child(`team${t}/pointsText`).transaction(c => {
+            const p = ["0", "15", "30", "40", "A"];
+            let i = p.indexOf(c); return (i < p.length - 1) ? p[i+1] : "0";
+        });}
+
+        function addGame(t) { db.transaction(d => {
+            if(d) {
+                let s = d.team1.sets + d.team2.sets; if(s > 2) s = 2;
+                d[`team${t}`].games[s]++; d.team1.pointsText = "0"; d.team2.pointsText = "0";
+                if(d[`team${t}`].games[s] >= 6) d[`team${t}`].sets++;
+            } return d;
+        });}
+
         function setServer(t) { db.update({ server: t }); }
-
-        function changeScore(team, val) {
-            db.child(`team${team}/pointsText`).transaction(current => {
-                const p = ["0", "15", "30", "40", "A"];
-                let idx = p.indexOf(current);
-                if (idx < p.length - 1) return p[idx + 1];
-                return "0";
-            });
-        }
-
-        function resetMatch() {
-            if(confirm("¿Resetear todo?")) {
-                db.update({
-                    "team1/pointsText": "0", "team2/pointsText": "0",
-                    "team1/games": [0,0,0], "team2/games": [0,0,0],
-                    "server": 1
-                });
-            }
-        }
+        function reset() { if(confirm("¿Resetear?")) db.update({ "team1/pointsText":"0","team2/pointsText":"0","team1/games":[0,0,0],"team2/games":[0,0,0],"team1/sets":0,"team2/sets":0,"server":1 });}
     </script>
 </body>
 </html>
-
