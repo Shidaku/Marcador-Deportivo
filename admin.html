@@ -3,171 +3,115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Panel de Control PRO - Pádel</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <title>Admin Padel Pro</title>
     <style>
-        /* --- CORRECCIÓN DE MÁRGENES Y DISEÑO MÓVIL --- */
-        * { box-sizing: border-box; } /* Crucial para los márgenes */
-        
-        body { 
-            font-family: 'Montserrat', sans-serif; 
-            background-color: #f0f2f5; 
-            margin: 0; 
-            padding: 10px; /* Pequeño padding general */
-            color: #333;
-            overflow-x: hidden; /* Evita scroll horizontal accidental */
-        }
-
-        .container { 
-            max-width: 600px; /* Limita el ancho en pantallas grandes */
-            margin: 0 auto; 
-            width: 100%;
-        }
-
-        h1 { text-align: center; font-size: 1.5rem; margin-bottom: 15px; }
-
-        .card { 
-            background: white; 
-            border-radius: 12px; 
-            padding: 15px; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
-            margin-bottom: 15px; 
-        }
-
-        .card-header { font-weight: bold; font-size: 1.1rem; border-bottom: 2px solid #eee; padding-bottom: 8px; margin-bottom: 12px; }
-
-        .input-group { margin-bottom: 12px; }
-        label { display: block; font-size: 0.85rem; font-weight: bold; margin-bottom: 4px; color: #666; }
-        
-        input[type="text"], select { 
-            width: 100%; 
-            padding: 12px; 
-            border: 1px solid #ddd; 
-            border-radius: 8px; 
-            font-size: 16px; /* Evita zoom automático en iPhone */
-        }
-
-        .color-pickers { display: flex; gap: 10px; }
-        .color-pickers div { flex: 1; }
-        input[type="color"] { width: 100%; height: 40px; border: none; cursor: pointer; border-radius: 8px; }
-
-        .btn { 
-            width: 100%; 
-            padding: 15px; 
-            border: none; 
-            border-radius: 10px; 
-            font-size: 1.1rem; 
-            font-weight: bold; 
-            cursor: pointer; 
-            color: white; 
-            transition: opacity 0.2s; 
-        }
+        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: #f0f2f5; margin: 0; padding: 10px; overflow-x: hidden; }
+        .container { max-width: 500px; margin: 0 auto; }
+        .card { background: white; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        h3 { margin-top: 0; color: #333; border-bottom: 2px solid #eee; padding-bottom: 5px; }
+        label { display: block; font-size: 12px; font-weight: bold; color: #666; margin-bottom: 4px; }
+        input, select { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .btn { border: none; border-radius: 8px; padding: 15px; color: white; font-weight: bold; cursor: pointer; font-size: 14px; }
         .btn:active { opacity: 0.7; }
-
-        .btn-green { background-color: #2ecc71; }
-        .btn-blue { background-color: #3399FF; }
-        .btn-red { background-color: #FF3333; }
-        .btn-gray { background-color: #95a5a6; }
-        .btn-reset { background-color: #e74c3c; margin-top: 20px; }
-
-        .score-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-
+        .btn-save { background: #2ecc71; width: 100%; }
+        .btn-blue { background: #3399FF; }
+        .btn-red { background: #FF3333; }
+        .btn-gray { background: #95a5a6; }
+        .btn-reset { background: #e74c3c; width: 100%; margin-top: 15px; }
     </style>
 </head>
 <body>
-
     <div class="container">
-        <h1>Marcador Padel Sports 96.7</h1>
-
         <div class="card">
-            <div class="card-header">Datos del Marcador</div>
-            <div class="input-group">
-                <label>Nombre de la Cancha</label>
-                <input type="text" id="courtName" placeholder="Ej: CIUDAD PADEL CENTRAL">
+            <h3>Nombres y Estilo</h3>
+            <label>Pareja 1 (Azul)</label>
+            <input type="text" id="nameT1" placeholder="Ej: LEANDRO / VLADIMIR">
+            <label>Pareja 2 (Rojo)</label>
+            <input type="text" id="nameT2" placeholder="Ej: WUIS / CARRANZA">
+            <div class="grid">
+                <div><label>Color T1</label><input type="color" id="colorT1" value="#3399FF"></div>
+                <div><label>Color T2</label><input type="color" id="colorT2" value="#FF3333"></div>
             </div>
-            <div class="input-group">
-                <label>Título del Partido</label>
-                <input type="text" id="matchTitle" placeholder="Ej: FINAL - 5TA MASCULINO">
-            </div>
-            <div class="color-pickers input-group">
-                <div><label>Color Equipo 1</label><input type="color" id="colorTeam1"></div>
-                <div><label>Color Equipo 2</label><input type="color" id="colorTeam2"></div>
-            </div>
-            <div class="input-group">
-                <label>Fuente del Marcador</label>
-                <select id="fontFamily">
-                    <option value="'Montserrat', sans-serif">Montserrat (Moderna)</option>
-                    <option value="'Orbitron', sans-serif">Orbitron (Digital)</option>
-                    <option value="'Roboto Condensed', sans-serif">Roboto Condensed (Deportiva)</option>
-                </select>
-            </div>
-            <button class="btn btn-green" onclick="saveSettings()">Guardar Estilos y Nombres</button>
+            <label>Fuente</label>
+            <select id="fontFamily">
+                <option value="'Orbitron', sans-serif">Digital (Orbitron)</option>
+                <option value="'Montserrat', sans-serif">Moderna (Montserrat)</option>
+                <option value="Arial, sans-serif">Clásica (Arial)</option>
+            </select>
+            <button class="btn btn-save" onclick="updateSettings()">GUARDAR CAMBIOS</button>
         </div>
 
         <div class="card">
-            <div class="card-header">Control de Puntos</div>
-            <div class="score-grid">
-                <button class="btn btn-blue" onclick="scorePoint(1)">+ Punto T1</button>
-                <button class="btn btn-red" onclick="scorePoint(2)">+ Punto T2</button>
+            <h3>Marcador en Vivo</h3>
+            <div class="grid">
+                <button class="btn btn-blue" onclick="changeScore(1, 1)">+ PUNTO T1</button>
+                <button class="btn btn-red" onclick="changeScore(2, 1)">+ PUNTO T2</button>
+                <button class="btn btn-gray" onclick="setServer(1)">SAQUE T1</button>
+                <button class="btn btn-gray" onclick="setServer(2)">SAQUE T2</button>
             </div>
-            <div class="score-grid">
-                <button class="btn btn-gray" onclick="endGame(1)">Gana Juego T1</button>
-                <button class="btn btn-gray" onclick="endGame(2)">Gana Juego T2</button>
-            </div>
-            <div class="score-grid">
-                <button class="btn btn-blue" onclick="changeServer(1)">Saque T1</button>
-                <button class="btn btn-red" onclick="changeServer(2)">Saque T2</button>
-            </div>
-            <button class="btn btn-reset" onclick="resetMatch()">RESETEAR PARTIDO COMPLETO</button>
+            <button class="btn btn-reset" onclick="resetMatch()">RESETEAR PARTIDO</button>
         </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-    
     <script>
-        // --- CONFIGURACIÓN DE FIREBASE (PEGA TUS DATOS AQUÍ) ---
         const firebaseConfig = {
             apiKey: "AIzaSyBVcHIyjlfCHLKYU2HNj2rmmPNpmghQrXc",
             authDomain: "marcador-deportivo-8f567.firebaseapp.com",
-            databaseURL: "https://marcador-deportivo-8f567-default-rtdb.firebaseio.com/", // Copia tu URL completa de Realtime Database aquí
+            databaseURL: "https://marcador-deportivo-8f567-default-rtdb.firebaseio.com/",
             projectId: "marcador-deportivo-8f567",
             storageBucket: "marcador-deportivo-8f567.firebasestorage.app",
             messagingSenderId: "803031766591",
-            appId: "1:803031766591:web:3767df3dcd00c752f78a8a",
+            appId: "1:803031766591:web:3767df3dcd00c752f78a8a"
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database().ref('matchState');
 
-        // Cargar datos iniciales en los inputs
-        db.on('value', (snapshot) => {
-            const data = snapshot.val();
+        function updateSettings() {
+            db.update({
+                "team1/names": document.getElementById('nameT1').value,
+                "team2/names": document.getElementById('nameT2').value,
+                "colorTeam1": document.getElementById('colorT1').value,
+                "colorTeam2": document.getElementById('colorT2').value,
+                "fontFamily": document.getElementById('fontFamily').value
+            });
+            alert("Configuración actualizada");
+        }
+
+        // Cargar datos actuales
+        db.on('value', snap => {
+            const data = snap.val();
             if(!data) return;
-            document.getElementById('courtName').value = data.courtName;
-            document.getElementById('matchTitle').value = data.matchTitle;
-            document.getElementById('colorTeam1').value = data.colorTeam1;
-            document.getElementById('colorTeam2').value = data.colorTeam2;
+            document.getElementById('nameT1').value = data.team1.names;
+            document.getElementById('nameT2').value = data.team2.names;
+            document.getElementById('colorT1').value = data.colorTeam1;
+            document.getElementById('colorT2').value = data.colorTeam2;
             document.getElementById('fontFamily').value = data.fontFamily;
         });
 
-        // Guardar personalización
-        function saveSettings() {
-            db.update({
-                courtName: document.getElementById('courtName').value,
-                matchTitle: document.getElementById('matchTitle').value,
-                colorTeam1: document.getElementById('colorTeam1').value,
-                colorTeam2: document.getElementById('colorTeam2').value,
-                fontFamily: document.getElementById('fontFamily').value
+        function setServer(t) { db.update({ server: t }); }
+
+        function changeScore(team, val) {
+            db.child(`team${team}/pointsText`).transaction(current => {
+                const p = ["0", "15", "30", "40", "A"];
+                let idx = p.indexOf(current);
+                if (idx < p.length - 1) return p[idx + 1];
+                return "0";
             });
-            alert("Personalización guardada");
         }
 
-        function changeServer(t) { db.update({ server: t }); }
-
-        // Aquí van tus funciones scorePoint, endGame y resetMatch de antes. 
-        // Asegúrate de copiarlas del código anterior y pegarlas aquí.
+        function resetMatch() {
+            if(confirm("¿Resetear todo?")) {
+                db.update({
+                    "team1/pointsText": "0", "team2/pointsText": "0",
+                    "team1/games": [0,0,0], "team2/games": [0,0,0],
+                    "server": 1
+                });
+            }
+        }
     </script>
 </body>
 </html>
-
-
